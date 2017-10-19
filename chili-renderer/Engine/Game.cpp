@@ -1,32 +1,8 @@
-/****************************************************************************************** 
- *	Chili DirectX Framework Version 16.07.20											  *	
- *	Game.cpp																			  *
- *	Copyright 2016 PlanetChili.net <http://www.planetchili.net>							  *
- *																						  *
- *	This file is part of The Chili DirectX Framework.									  *
- *																						  *
- *	The Chili DirectX Framework is free software: you can redistribute it and/or modify	  *
- *	it under the terms of the GNU General Public License as published by				  *
- *	the Free Software Foundation, either version 3 of the License, or					  *
- *	(at your option) any later version.													  *
- *																						  *
- *	The Chili DirectX Framework is distributed in the hope that it will be useful,		  *
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of						  *
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the						  *
- *	GNU General Public License for more details.										  *
- *																						  *
- *	You should have received a copy of the GNU General Public License					  *
- *	along with The Chili DirectX Framework.  If not, see <http://www.gnu.org/licenses/>.  *
- ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
 
-Game::Game( MainWindow& wnd )
-	:
-	wnd( wnd ),
-	gfx( wnd )
-{
-}
+Game::Game( MainWindow& wnd ) : wnd( wnd ), gfx( wnd )
+{}
 
 void Game::Go()
 {
@@ -36,10 +12,86 @@ void Game::Go()
 	gfx.EndFrame();
 }
 
+int shipXPos = 400;
+int shipYPos = 300;
+int shipSpeed = 8;
+int shipLenght = 20;
+int shotYLenght = 10;
+
+bool isShoting = false;
+int shotYPos = shipYPos;
+int shotXPos = shipXPos + shipLenght / 2;
+int shotSpeed = 30;
+int shotLenght = 10;
+
 void Game::UpdateModel()
 {
-}
+	if (wnd.kbd.KeyIsPressed(VK_UP))
+	{
+		int nextPos = shipYPos - shipSpeed;
+		if (nextPos < 0)
+		{
+			return;
+		}
+		shipYPos = nextPos;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_DOWN))
+	{
+		int nextPos = shipYPos + shipSpeed;
+		if (nextPos + shipLenght >= 600)
+		{
+			return;
+		}
+		shipYPos = nextPos;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_LEFT))
+	{
 
+		int nextPos = shipXPos - shipSpeed;
+		if (nextPos < 0)
+		{
+			return;
+		}
+		shipXPos = nextPos;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_RIGHT))
+	{
+		int nextPos = shipXPos + shipSpeed;
+		if (nextPos + shipLenght >= 800)
+		{
+			return;
+		}
+		shipXPos = nextPos;
+	}
+
+	if (wnd.kbd.KeyIsPressed(VK_SPACE))
+	{
+		isShoting = true;
+	}
+}
 void Game::ComposeFrame()
 {
+	int scopedXPos = shipXPos;
+	int scopedYPos = shipYPos;
+	for (int i = 0; i < shipLenght; i++) {
+		gfx.PutPixel(shipXPos + i, shipYPos, 255, 255, 255);
+		gfx.PutPixel(scopedXPos, shipYPos + i, 255, 255, 255);
+		gfx.PutPixel(shipXPos + i, scopedYPos + shipLenght, 255, 255, 255);
+		gfx.PutPixel(scopedXPos + shipLenght, shipYPos + i, 255, 255, 255);
+	}
+
+	if (isShoting)
+	{
+		for (int i = 0; i < shotLenght; i++) {
+			gfx.PutPixel(shotXPos, shotYPos - i, 255, 0, 0);
+		}
+		int nextPosition = shotYPos - shotSpeed;
+		if (nextPosition > 1)
+		{ 
+			shotYPos = nextPosition;
+		}
+	}
+
 }
+
+
